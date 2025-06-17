@@ -14,3 +14,20 @@ services:
     volumes:
       - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - ./data:/var/lib/mysql
+
+  app:
+    image: openjdk:17
+    container_name: app-deadline
+    depends_on:
+      - mysql
+    volumes:
+      - ./app-deadline.jar:/app/app-deadline.jar
+    command:
+      - java
+      - -jar
+      - /app/app-deadline.jar
+      - -P:jdbc.url=jdbc:mysql://mysql:3306/app
+      - -P:jdbc.user=app
+      - -P:jdbc.password=pass
+    ports:
+      - "9999:9999"
