@@ -5,18 +5,29 @@ plugins {
 group 'ru.netology'
 version '1.0-SNAPSHOT'
 
+java {
+    sourceCompatibility = 11
+}
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'io.rest-assured:rest-assured:5.5.0'
-    testImplementation 'com.google.code.gson:gson:2.10.1'
+    // UI-тесты на Selenide
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'com.codeborne:selenide:6.12.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.3'
+    // JDBC-драйвер для чтения кодов из БД
+    testImplementation 'mysql:mysql-connector-java:8.0.32'
+    // Lombok для вспомогательных POJO (если используется)
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
 }
 
 test {
     useJUnitPlatform()
+    systemProperty 'selenide.headless', System.getProperty('selenide.headless', 'true')
 }
