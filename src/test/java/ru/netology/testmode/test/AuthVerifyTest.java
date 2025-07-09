@@ -7,11 +7,13 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.netology.testmode.data.DataHelper;
-import ru.netology.testmode.data.DataHelper.User;
+import ru.netology.testmode.data.User;
 import ru.netology.testmode.data.DbHelper;
 
+import java.sql.SQLException;
+
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AuthVerifyTest {
     private static RequestSpecification spec;
@@ -27,8 +29,18 @@ public class AuthVerifyTest {
                 .build();
     }
 
+    static class AuthVerifyRequest {
+        public final String login;
+        public final String code;
+
+        public AuthVerifyRequest(String login, String code) {
+            this.login = login;
+            this.code = code;
+        }
+    }
+
     @Test
-    void shouldVerifyCodeAfterAuth() {
+    void shouldVerifyCodeAfterAuth() throws SQLException {
         User user = DataHelper.getRegisteredActiveUser();
         given().spec(spec).body(user)
                 .when().post("/api/auth")
@@ -38,7 +50,7 @@ public class AuthVerifyTest {
         assertNotNull(code);
 
         given().spec(spec)
-                .body(new Object() { public final String login = user.getLogin(); public final String code = code; })
+                .body(new AuthVerifyRequest(user.getLogin(), code))
                 .when().post("/api/auth/verify")
                 .then().statusCode(200);
     }

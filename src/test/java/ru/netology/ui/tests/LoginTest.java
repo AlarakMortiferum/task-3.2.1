@@ -3,6 +3,7 @@ package ru.netology.testmode.ui.tests;
 import org.junit.jupiter.api.Test;
 import ru.netology.testmode.data.DataGenerator;
 import ru.netology.testmode.ui.pages.LoginPage;
+import ru.netology.testmode.data.User;
 
 import static com.codeborne.selenide.Selenide.open;
 

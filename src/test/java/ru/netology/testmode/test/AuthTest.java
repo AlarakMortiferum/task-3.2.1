@@ -1,12 +1,13 @@
 package ru.netology.testmode.test;
 
+import ru.netology.testmode.data.User;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import ru.netology.testmode.data.DataHelper.User;
+import ru.netology.testmode.data.User;
 import ru.netology.testmode.data.DataHelper;
 
 import static io.restassured.RestAssured.given;
