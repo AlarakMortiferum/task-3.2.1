@@ -2,7 +2,8 @@ package ru.netology.ui.tests;
 
 import org.junit.jupiter.api.*;
 import ru.netology.testmode.data.DataHelper;
-import ru.netology.ui.pages.LoginPage; // Исправленный импорт
+import ru.netology.ui.pages.LoginPage;
+import ru.netology.ui.pages.VerificationPage;
 
 import static com.codeborne.selenide.Selenide.open;
 

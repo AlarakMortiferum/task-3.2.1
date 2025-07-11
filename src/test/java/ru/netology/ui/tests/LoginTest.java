@@ -1,20 +1,27 @@
 package ru.netology.ui.tests;
 
+import ru.netology.testmode.data.SQLHelper;
+import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import ru.netology.testmode.data.DataGenerator;
-import ru.netology.ui.pages.LoginPage; // Исправленный импорт
+import ru.netology.ui.pages.LoginPage;
+import ru.netology.ui.pages.VerificationPage;
 
 import static com.codeborne.selenide.Selenide.open;
 
 public class LoginTest {
 
     @Test
-    void shouldLoginWithValidActiveUser() {
+    void shouldLoginWithValidActiveUser() throws SQLException {
         var user = DataGenerator.getActiveUser();
         open("http://localhost:9999");
 
-        new LoginPage()
-                .loginWith(user.getLogin(), user.getPassword())
+        var verificationPage = new LoginPage()
+                .loginWith(user.getLogin(), user.getPassword()); // Исправлено
+
+
+        var code = SQLHelper.getVerificationCodeFor(user);
+        verificationPage.validVerify(code)
                 .shouldSeeDashboard();
     }
 
@@ -25,7 +32,7 @@ public class LoginTest {
 
         new LoginPage()
                 .loginWith(user.getLogin(), user.getPassword())
-                .shouldShowErrorNotification("Пользователь заблокирован");
+                .shouldShowBlockedNotification();
     }
 
     @Test
@@ -33,8 +40,8 @@ public class LoginTest {
         var user = DataGenerator.getRandomUser();
         open("http://localhost:9999");
 
-        new LoginPage()
-                .loginWith(user.getLogin(), user.getPassword())
-                .shouldShowErrorNotification("Неверно указан логин или пароль");
+        var loginPage = new LoginPage();
+        loginPage.loginWith(user.getLogin(), user.getPassword());
+        loginPage.verifyErrorNotification();
     }
 }

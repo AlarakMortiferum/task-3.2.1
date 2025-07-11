@@ -3,7 +3,7 @@ package ru.netology.ui.tests;
 import org.junit.jupiter.api.Test;
 import ru.netology.testmode.data.DataGenerator;
 import ru.netology.testmode.data.SQLHelper;
-import ru.netology.ui.pages.LoginPage; // Исправленный импорт
+import ru.netology.ui.pages.LoginPage;
 import ru.netology.testmode.data.User;
 
 import java.sql.SQLException;
@@ -18,10 +18,10 @@ public class Login2FATest {
         open("http://localhost:9999");
 
         var verificationPage = new LoginPage()
-                .loginWith(user.getLogin(), user.getPassword());
+                .loginWith(user.getLogin(), user.getPassword()); // Исправлено
 
         var code = SQLHelper.getVerificationCodeFor(user);
-        verificationPage.enterCode(code)
+        verificationPage.validVerify(code)
                 .shouldSeeDashboard();
     }
 }

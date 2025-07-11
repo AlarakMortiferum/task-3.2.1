@@ -1,8 +1,10 @@
 package ru.netology.ui.pages;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import ru.netology.testmode.data.User;
 
+import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
@@ -18,12 +20,17 @@ public class VerificationPage {
         return this;
     }
 
-    public void shouldSeeDashboard() {
+    public VerificationPage shouldSeeDashboard() {
         dashboard.shouldBe(visible);
+        return this;
     }
 
     public void enterWrongCodeThreeTimes() {
-        // Реализация трёхкратного ввода неправильного кода
+        for (int i = 0; i < 3; i++) {
+            codeField.setValue("000000");
+            verifyButton.click();
+            errorNotification.shouldBe(visible);
+        }
     }
 
     public void shouldShowBlockedNotification() {
