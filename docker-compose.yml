@@ -17,17 +17,3 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  app:
-    image: task-3.2.1-app
-    container_name: app
-    build: .
-    ports:
-      - "9999:9999"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/app
-      SPRING_DATASOURCE_USERNAME: app
-      SPRING_DATASOURCE_PASSWORD: pass
-    depends_on:
-      db:
-        condition: service_healthy
