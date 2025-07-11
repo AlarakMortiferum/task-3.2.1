@@ -28,4 +28,15 @@ public class LoginPage {
                 .shouldBe(visible).shouldHave(com.codeborne.selenide.Condition.text(text));
         return this;
     }
+    public VerificationPage validLogin(User user) {
+        loginField.setValue(user.getLogin());
+        passwordField.setValue(user.getPassword());
+        loginButton.click();
+        return new VerificationPage();
+    }
+
+    public void verifyUserBlocked() {
+        errorNotification.shouldBe(visible)
+                .shouldHave(text("Пользователь заблокирован"));
+    }
 }

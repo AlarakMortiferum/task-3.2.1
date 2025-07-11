@@ -1,60 +1,55 @@
 package ru.netology.testmode.test;
 
-import ru.netology.testmode.data.User;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.netology.testmode.data.User;
 import ru.netology.testmode.data.DataHelper;
+import ru.netology.testmode.data.SQLHelper;
+import ru.netology.testmode.page.LoginPage;
 
-import static io.restassured.RestAssured.given;
+import static com.codeborne.selenide.Selenide.open;
+import static ru.netology.testmode.data.SQLHelper.clearDatabase;
 
 public class AuthTest {
-    private static RequestSpecification spec;
 
-    @BeforeAll
-    static void setup() {
-        spec = new RequestSpecBuilder()
-                .setBaseUri("http://localhost")
-                .setPort(9999)
-                .setAccept(ContentType.JSON)
-                .setContentType(ContentType.JSON)
-                .log(LogDetail.ALL)
-                .build();
+    @BeforeEach
+    void setUp() {
+        open("http://localhost:9999");
+    }
+
+    @BeforeEach
+    void clearAll() throws Exception {
+        clearDatabase();
     }
 
     @Test
     void shouldLoginWithActive() {
-        User user = DataHelper.getRegisteredActiveUser();
-        given().spec(spec).body(user)
-                .when().post("/api/auth")
-                .then().statusCode(200);
+        var loginPage = new LoginPage();
+        var user = DataHelper.getRegisteredActiveUser();
+        var verificationPage = loginPage.validLogin(user);
+        verificationPage.validVerify();
     }
 
     @Test
     void shouldNotLoginWithBlocked() {
-        User user = DataHelper.getRegisteredBlockedUser();
-        given().spec(spec).body(user)
-                .when().post("/api/auth")
-                .then().statusCode(403);
+        var loginPage = new LoginPage();
+        var user = DataHelper.getRegisteredBlockedUser();
+        loginPage.validLogin(user);
+        loginPage.verifyUserBlocked();
     }
 
     @Test
     void shouldNotLoginWrongLogin() {
-        User user = DataHelper.getWrongLoginUser();
-        given().spec(spec).body(user)
-                .when().post("/api/auth")
-                .then().statusCode(401);
+        var loginPage = new LoginPage();
+        var user = DataHelper.getWrongLoginUser();
+        loginPage.validLogin(user);
+        loginPage.verifyErrorNotification();
     }
 
     @Test
     void shouldNotLoginWrongPassword() {
-        User user = DataHelper.getWrongPasswordUser();
-        given().spec(spec).body(user)
-                .when().post("/api/auth")
-                .then().statusCode(401);
+        var loginPage = new LoginPage();
+        var user = DataHelper.getWrongPasswordUser();
+        loginPage.validLogin(user);
+        loginPage.verifyErrorNotification();
     }
 }
