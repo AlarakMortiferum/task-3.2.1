@@ -17,7 +17,11 @@ public class DbService {
             statement.executeUpdate();
         }
     }
-
+    public void cleanDatabase() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("DELETE FROM users");
+        }
+    }
     public boolean userExists(String login) throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE login = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
