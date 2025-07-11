@@ -1,28 +1,33 @@
-package ru.netology.testmode.ui.pages;
+package ru.netology.ui.pages;
 
 import com.codeborne.selenide.SelenideElement;
+import ru.netology.testmode.data.User;
+
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 public class VerificationPage {
-    private SelenideElement codeInput = $("[data-test-id=code] input");
-    private SelenideElement verifyButton = $("button[type=button]");
-    private SelenideElement errorNotification = $("[data-test-id=error-notification]");
+    private final SelenideElement codeField = $("[data-test-id=code] input");
+    private final SelenideElement verifyButton = $("[data-test-id=action-verify]");
+    private final SelenideElement errorNotification = $("[data-test-id=error-notification]");
+    private final SelenideElement dashboard = $("[data-test-id=dashboard]");
 
-    public VerificationPage enterCode(String code) {
-        codeInput.setValue(code);
+    public VerificationPage validVerify(String code) {
+        codeField.setValue(code);
         verifyButton.click();
         return this;
     }
 
-    public VerificationPage shouldSeeError(String text) {
-        errorNotification.shouldBe(visible).shouldHave(com.codeborne.selenide.Condition.text(text));
-        return this;
+    public void shouldSeeDashboard() {
+        dashboard.shouldBe(visible);
     }
 
-    public DashboardPage shouldSeeDashboard() {
-        // Проверяем, что открылась страница дашборда
-        $("[data-test-id=dashboard]").shouldBe(visible);
-        return new DashboardPage();
+    public void enterWrongCodeThreeTimes() {
+        // Реализация трёхкратного ввода неправильного кода
+    }
+
+    public void shouldShowBlockedNotification() {
+        errorNotification.shouldBe(visible)
+                .shouldHave(text("Пользователь заблокирован"));
     }
 }

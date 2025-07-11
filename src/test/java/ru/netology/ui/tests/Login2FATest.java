@@ -1,26 +1,26 @@
-package ru.netology.testmode.ui.tests;
+package ru.netology.ui.tests;
 
 import org.junit.jupiter.api.Test;
 import ru.netology.testmode.data.DataGenerator;
 import ru.netology.testmode.data.SQLHelper;
-import ru.netology.testmode.ui.pages.LoginPage;
+import ru.netology.ui.pages.LoginPage; // Исправленный импорт
 import ru.netology.testmode.data.User;
 
-import java.sql.SQLException; // Добавьте этот импорт
+import java.sql.SQLException;
 
 import static com.codeborne.selenide.Selenide.open;
 
 public class Login2FATest {
 
     @Test
-    void shouldLoginSuccessfullyWithCorrectCode() throws SQLException { // Добавьте throws SQLException здесь
+    void shouldLoginSuccessfullyWithCorrectCode() throws SQLException {
         var user = DataGenerator.getActiveUser();
-        open("/login");
+        open("http://localhost:9999");
 
         var verificationPage = new LoginPage()
                 .loginWith(user.getLogin(), user.getPassword());
 
-        var code = SQLHelper.getVerificationCodeFor(user); // Теперь исключение обработано
+        var code = SQLHelper.getVerificationCodeFor(user);
         verificationPage.enterCode(code)
                 .shouldSeeDashboard();
     }

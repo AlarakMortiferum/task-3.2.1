@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.netology.testmode.data.DataHelper;
 import ru.netology.testmode.data.SQLHelper;
-import ru.netology.ui.pages.VerificationPage; // Исправленный импорт
+import ru.netology.ui.pages.VerificationPage;
 
 import static com.codeborne.selenide.Selenide.open;
 

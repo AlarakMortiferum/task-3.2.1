@@ -1,7 +1,8 @@
 package ru.netology.ui.pages;
 
 import com.codeborne.selenide.SelenideElement;
-import ru.netology.testmode.data.User; // Добавленный импорт
+import ru.netology.testmode.data.User;
+import ru.netology.ui.pages.VerificationPage;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;

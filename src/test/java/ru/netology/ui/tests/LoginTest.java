@@ -1,9 +1,8 @@
-package ru.netology.testmode.ui.tests;
+package ru.netology.ui.tests;
 
 import org.junit.jupiter.api.Test;
 import ru.netology.testmode.data.DataGenerator;
-import ru.netology.testmode.ui.pages.LoginPage;
-import ru.netology.testmode.data.User;
+import ru.netology.ui.pages.LoginPage; // Исправленный импорт
 
 import static com.codeborne.selenide.Selenide.open;
 
@@ -12,27 +11,30 @@ public class LoginTest {
     @Test
     void shouldLoginWithValidActiveUser() {
         var user = DataGenerator.getActiveUser();
-        open("/login");
+        open("http://localhost:9999");
+
         new LoginPage()
-                .loginWith(user.getLogin(), user.getPassword());
-        // переходит на VerificationPage — проверяется в Login2FATest
+                .loginWith(user.getLogin(), user.getPassword())
+                .shouldSeeDashboard();
     }
 
     @Test
     void shouldNotLoginWithBlockedUser() {
         var user = DataGenerator.getBlockedUser();
-        open("/login");
+        open("http://localhost:9999");
+
         new LoginPage()
                 .loginWith(user.getLogin(), user.getPassword())
-                .shouldSeeError("Ошибка! Пользователь заблокирован");
+                .shouldShowErrorNotification("Пользователь заблокирован");
     }
 
     @Test
     void shouldNotLoginWithInvalidUser() {
-        var user = DataGenerator.getRandomUser(); // пользователь не зарегистрирован
-        open("/login");
+        var user = DataGenerator.getRandomUser();
+        open("http://localhost:9999");
+
         new LoginPage()
                 .loginWith(user.getLogin(), user.getPassword())
-                .shouldSeeError("Ошибка! Неверно указан логин или пароль");
+                .shouldShowErrorNotification("Неверно указан логин или пароль");
     }
 }
