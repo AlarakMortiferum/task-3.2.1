@@ -1,19 +1,18 @@
 version: '3'
 
 services:
-  db:
-    image: postgres:14
-    container_name: db
-    ports:
-      - "5432:5432"
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
     environment:
-      POSTGRES_DB: app
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: pass
+    ports:
+      - "3306:3306"
     volumes:
-      - ./db:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d app"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
