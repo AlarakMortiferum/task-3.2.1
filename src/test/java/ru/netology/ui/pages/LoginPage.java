@@ -21,7 +21,6 @@ public class LoginPage {
         return new VerificationPage();
     }
 
-    // Добавленный метод
     public VerificationPage loginWith(String login, String password) {
         loginField.setValue(login);
         passwordField.setValue(password);

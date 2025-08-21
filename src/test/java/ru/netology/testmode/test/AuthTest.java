@@ -7,8 +7,6 @@ import ru.netology.testmode.data.SQLHelper;
 import ru.netology.testmode.data.User;
 import ru.netology.ui.pages.LoginPage;
 
-import java.sql.SQLException;
-
 import static com.codeborne.selenide.Selenide.open;
 
 public class AuthTest {
@@ -24,12 +22,12 @@ public class AuthTest {
     }
 
     @AfterAll
-    static void tearDownAll() throws SQLException {
+    static void tearDownAll() {
         SQLHelper.clearDatabase();
     }
 
     @Test
-    void shouldLoginWithActiveUser() throws SQLException {
+    void shouldLoginWithActiveUser() {
         User user = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(user);
 
@@ -41,7 +39,7 @@ public class AuthTest {
     }
 
     @Test
-    void shouldNotLoginWithBlockedUser() throws SQLException {
+    void shouldNotLoginWithBlockedUser() {
         User user = DataHelper.getRegisteredBlockedUser();
         SQLHelper.addUserIfNeeded(user);
 
@@ -59,7 +57,7 @@ public class AuthTest {
     }
 
     @Test
-    void shouldNotLoginWithWrongPassword() throws SQLException {
+    void shouldNotLoginWithWrongPassword() {
         User validUser = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(validUser);
 
@@ -70,7 +68,7 @@ public class AuthTest {
     }
 
     @Test
-    void shouldLoginSuccessfullyWith2FA() throws SQLException {
+    void shouldLoginSuccessfullyWith2FA() {
         User user = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(user);
 
@@ -82,7 +80,7 @@ public class AuthTest {
     }
 
     @Test
-    void shouldBlockUserAfterThreeWrong2FACodes() throws SQLException {
+    void shouldBlockUserAfterThreeWrong2FACodes() {
         User user = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(user);
 
@@ -93,7 +91,7 @@ public class AuthTest {
     }
 
     @Test
-    void shouldVerifyCodeAfterAuth() throws SQLException {
+    void shouldVerifyCodeAfterAuth() {
         User user = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(user);
 
