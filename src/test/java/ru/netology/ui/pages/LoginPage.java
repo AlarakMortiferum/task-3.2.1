@@ -2,7 +2,6 @@ package ru.netology.ui.pages;
 
 import com.codeborne.selenide.SelenideElement;
 import ru.netology.testmode.data.User;
-import ru.netology.ui.pages.VerificationPage;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -21,20 +20,7 @@ public class LoginPage {
         return new VerificationPage();
     }
 
-    public VerificationPage loginWith(String login, String password) {
-        loginField.setValue(login);
-        passwordField.setValue(password);
-        loginButton.click();
-        return new VerificationPage();
-    }
-
-    public void verifyUserBlocked() {
-        errorNotification.shouldBe(visible)
-                .shouldHave(text("Пользователь заблокирован"));
-    }
-
-    public void verifyErrorNotification() {
-        errorNotification.shouldBe(visible)
-                .shouldHave(text("Неверно указан логин или пароль"));
+    public void verifyNotification(String expectedText) {
+        errorNotification.shouldBe(visible).shouldHave(text(expectedText));
     }
 }

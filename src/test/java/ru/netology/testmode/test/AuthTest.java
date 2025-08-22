@@ -5,7 +5,9 @@ import org.junit.jupiter.api.*;
 import ru.netology.testmode.data.DataHelper;
 import ru.netology.testmode.data.SQLHelper;
 import ru.netology.testmode.data.User;
+import ru.netology.ui.pages.DashboardPage;
 import ru.netology.ui.pages.LoginPage;
+import ru.netology.ui.pages.VerificationPage;
 
 import static com.codeborne.selenide.Selenide.open;
 
@@ -31,11 +33,11 @@ public class AuthTest {
         User user = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(user);
 
-        var loginPage = new LoginPage();
-        var verificationPage = loginPage.validLogin(user);
-        var code = SQLHelper.getVerificationCodeFor(user);
-        verificationPage.validVerify(code)
-                .shouldSeeDashboard();
+        LoginPage loginPage = new LoginPage();
+        VerificationPage verificationPage = loginPage.validLogin(user);
+        String code = SQLHelper.getVerificationCodeFor(user);
+        DashboardPage dashboardPage = verificationPage.validVerify(code);
+        dashboardPage.shouldBeVisible();
     }
 
     @Test
@@ -43,17 +45,17 @@ public class AuthTest {
         User user = DataHelper.getRegisteredBlockedUser();
         SQLHelper.addUserIfNeeded(user);
 
-        var loginPage = new LoginPage();
+        LoginPage loginPage = new LoginPage();
         loginPage.validLogin(user);
-        loginPage.verifyUserBlocked();
+        loginPage.verifyNotification("Пользователь заблокирован");
     }
 
     @Test
     void shouldNotLoginWithWrongLogin() {
-        var loginPage = new LoginPage();
-        var user = DataHelper.getWrongLoginUser();
+        User user = DataHelper.getWrongLoginUser();
+        LoginPage loginPage = new LoginPage();
         loginPage.validLogin(user);
-        loginPage.verifyErrorNotification();
+        loginPage.verifyNotification("Неверно указан логин или пароль");
     }
 
     @Test
@@ -61,22 +63,10 @@ public class AuthTest {
         User validUser = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(validUser);
 
-        var loginPage = new LoginPage();
-        var wrongPasswordUser = new User(validUser.getLogin(), "wrongPassword", validUser.getStatus());
+        LoginPage loginPage = new LoginPage();
+        User wrongPasswordUser = new User(validUser.getLogin(), "wrongPassword", validUser.getStatus());
         loginPage.validLogin(wrongPasswordUser);
-        loginPage.verifyErrorNotification();
-    }
-
-    @Test
-    void shouldLoginSuccessfullyWith2FA() {
-        User user = DataHelper.getRegisteredActiveUser();
-        SQLHelper.addUserIfNeeded(user);
-
-        var loginPage = new LoginPage();
-        var verificationPage = loginPage.validLogin(user);
-        var code = SQLHelper.getVerificationCodeFor(user);
-        verificationPage.validVerify(code)
-                .shouldSeeDashboard();
+        loginPage.verifyNotification("Неверно указан логин или пароль");
     }
 
     @Test
@@ -84,21 +74,9 @@ public class AuthTest {
         User user = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(user);
 
-        var loginPage = new LoginPage();
-        var verificationPage = loginPage.validLogin(user);
-        verificationPage.enterWrongCodeThreeTimes();
-        verificationPage.shouldShowBlockedNotification();
-    }
-
-    @Test
-    void shouldVerifyCodeAfterAuth() {
-        User user = DataHelper.getRegisteredActiveUser();
-        SQLHelper.addUserIfNeeded(user);
-
-        var loginPage = new LoginPage();
-        var verificationPage = loginPage.validLogin(user);
-        var code = SQLHelper.getVerificationCodeFor(user);
-        verificationPage.validVerify(code)
-                .shouldSeeDashboard();
+        LoginPage loginPage = new LoginPage();
+        VerificationPage verificationPage = loginPage.validLogin(user);
+        verificationPage.enterWrongCodeMultipleTimes(DataHelper.getWrongVerificationCode(), 3);
+        verificationPage.verifyErrorNotification("Пользователь заблокирован");
     }
 }

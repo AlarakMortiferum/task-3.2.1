@@ -1,7 +1,12 @@
 package ru.netology.testmode.data;
 
-import java.sql.*;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class SQLHelper {
     private static final String URL = "jdbc:mysql://localhost:3306/app";
@@ -15,67 +20,44 @@ public class SQLHelper {
     }
 
     public static void addUserIfNeeded(User user) {
-        try {
-            if (!userExists(user.getLogin())) {
-                addUser(user);
+        QueryRunner runner = new QueryRunner();
+        String checkSql = "SELECT COUNT(*) FROM users WHERE login = ?";
+
+        try (Connection conn = getConnection()) {
+            Long count = runner.query(conn, checkSql, new ScalarHandler<>(), user.getLogin());
+            if (count == 0) {
+                String insertSql = "INSERT INTO users (login, password, status) VALUES (?, ?, ?)";
+                runner.update(conn, insertSql,
+                        user.getLogin(),
+                        BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()),
+                        user.getStatus());
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static boolean userExists(String login) throws SQLException {
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT COUNT(*) FROM users WHERE login = ?")) {
-            stmt.setString(1, login);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        }
-        return false;
-    }
-
-    private static void addUser(User user) throws SQLException {
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO users (login, password, status) VALUES (?, ?, ?)")) {
-            stmt.setString(1, user.getLogin());
-            stmt.setString(2, BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
-            stmt.setString(3, user.getStatus());
-            stmt.executeUpdate();
         }
     }
 
     public static String getVerificationCodeFor(User user) {
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT code FROM auth_codes WHERE user_id = (" +
-                             "SELECT id FROM users WHERE login = ?" +
-                             ") ORDER BY created DESC LIMIT 1")) {
-            stmt.setString(1, user.getLogin());
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("code");
-                }
-            }
+        QueryRunner runner = new QueryRunner();
+        String sql = "SELECT code FROM auth_codes WHERE user_id = " +
+                "(SELECT id FROM users WHERE login = ?) ORDER BY created DESC LIMIT 1";
+
+        try (Connection conn = getConnection()) {
+            return runner.query(conn, sql, new ScalarHandler<>(), user.getLogin());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        throw new RuntimeException("Verification code not found for user: " + user.getLogin());
     }
 
     public static void clearDatabase() {
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
-            stmt.executeUpdate("TRUNCATE TABLE auth_codes");
-            stmt.executeUpdate("TRUNCATE TABLE card_transactions");
-            stmt.executeUpdate("TRUNCATE TABLE cards");
-            stmt.executeUpdate("TRUNCATE TABLE users");
-            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS = 1");
+        QueryRunner runner = new QueryRunner();
+        try (Connection conn = getConnection()) {
+            runner.update(conn, "SET FOREIGN_KEY_CHECKS = 0");
+            runner.update(conn, "TRUNCATE TABLE auth_codes");
+            runner.update(conn, "TRUNCATE TABLE card_transactions");
+            runner.update(conn, "TRUNCATE TABLE cards");
+            runner.update(conn, "TRUNCATE TABLE users");
+            runner.update(conn, "SET FOREIGN_KEY_CHECKS = 1");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

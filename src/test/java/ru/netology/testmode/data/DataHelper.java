@@ -1,7 +1,6 @@
 package ru.netology.testmode.data;
 
 public class DataHelper {
-
     public static User getRegisteredActiveUser() {
         return new User("vasya", "qwerty123", "active");
     }
@@ -16,5 +15,9 @@ public class DataHelper {
 
     public static User getWrongPasswordUser() {
         return new User("vasya", "wrongPassword", "active");
+    }
+
+    public static String getWrongVerificationCode() {
+        return "000000";
     }
 }

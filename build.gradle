@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'io.freefair.lombok' version '8.6'
 }
 
 group 'ru.netology'
@@ -21,6 +22,10 @@ dependencies {
     testImplementation 'org.slf4j:slf4j-simple:2.0.9'
     testImplementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation 'org.mindrot:jbcrypt:0.4'
+    testImplementation 'commons-dbutils:commons-dbutils:1.7'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
 test {
