@@ -15,7 +15,6 @@ public class AuthTest {
 
     @BeforeAll
     static void setupAll() {
-        Configuration.headless = true;
     }
 
     @BeforeEach
@@ -35,6 +34,7 @@ public class AuthTest {
 
         LoginPage loginPage = new LoginPage();
         VerificationPage verificationPage = loginPage.validLogin(user);
+        verificationPage.isPageLoaded(); // Добавьте эту строку
         String code = SQLHelper.getVerificationCodeFor(user);
         DashboardPage dashboardPage = verificationPage.validVerify(code);
         dashboardPage.shouldBeVisible();
@@ -42,12 +42,13 @@ public class AuthTest {
 
     @Test
     void shouldNotLoginWithBlockedUser() {
-        User user = DataHelper.getRegisteredBlockedUser();
+        User user = DataHelper.getRegisteredActiveUser();
         SQLHelper.addUserIfNeeded(user);
+        SQLHelper.updateUserStatus(user.getLogin(), "blocked");
 
         LoginPage loginPage = new LoginPage();
         loginPage.validLogin(user);
-        loginPage.verifyNotification("Пользователь заблокирован");
+        loginPage.verifyNotification("Ошибка! Пользователь заблокирован"); // Обновленный текст
     }
 
     @Test
@@ -55,7 +56,7 @@ public class AuthTest {
         User user = DataHelper.getWrongLoginUser();
         LoginPage loginPage = new LoginPage();
         loginPage.validLogin(user);
-        loginPage.verifyNotification("Неверно указан логин или пароль");
+        loginPage.verifyNotification("Ошибка! Неверно указан логин или пароль"); // Обновленный текст
     }
 
     @Test
@@ -76,7 +77,8 @@ public class AuthTest {
 
         LoginPage loginPage = new LoginPage();
         VerificationPage verificationPage = loginPage.validLogin(user);
+        verificationPage.isPageLoaded();
         verificationPage.enterWrongCodeMultipleTimes(DataHelper.getWrongVerificationCode(), 3);
-        verificationPage.verifyErrorNotification("Пользователь заблокирован");
+        verificationPage.verifyErrorNotification("Ошибка! Пользователь заблокирован");
     }
 }

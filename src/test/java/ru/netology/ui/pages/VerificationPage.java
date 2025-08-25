@@ -28,4 +28,8 @@ public class VerificationPage {
             errorNotification.shouldBe(visible);
         }
     }
+    public void isPageLoaded() {
+        codeField.shouldBe(visible);
+        verifyButton.shouldBe(visible);
+    }
 }
