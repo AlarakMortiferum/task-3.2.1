@@ -11,31 +11,37 @@ import ru.netology.ui.pages.VerificationPage;
 import static com.codeborne.selenide.Selenide.open;
 
 public class AuthTest {
+    private User activeUser;
+    private User blockedUser;
 
     @BeforeEach
     void setup() {
         SQLHelper.clearDatabase();
+
+        activeUser = DataHelper.getRegisteredActiveUser();
+        blockedUser = DataHelper.getRegisteredBlockedUser();
+
+        SQLHelper.addUserIfNeeded(activeUser);
+        SQLHelper.addUserIfNeeded(blockedUser);
+        SQLHelper.updateUserStatus(blockedUser.getLogin(), "blocked");
+
         open("http://localhost:9999");
     }
 
     @Test
     void shouldLoginWithActiveUser() {
-        User user = DataHelper.getRegisteredActiveUser();
-        SQLHelper.addUserIfNeeded(user);
-
         LoginPage loginPage = new LoginPage();
-        VerificationPage verificationPage = loginPage.validLogin(user);
+        VerificationPage verificationPage = loginPage.validLogin(activeUser);
         verificationPage.isPageLoaded();
-        String code = SQLHelper.getVerificationCodeFor(user);
+
+        String code = SQLHelper.getVerificationCodeFor(activeUser);
         DashboardPage dashboardPage = verificationPage.validVerify(code);
         dashboardPage.shouldBeVisible();
     }
 
     @Test
     void shouldNotLoginWithBlockedUser() {
-        User user = DataHelper.getRegisteredActiveUser();
-        SQLHelper.addUserIfNeeded(user);
-        SQLHelper.updateUserStatus(user.getLogin(), "blocked");
+        User user = DataHelper.getRegisteredBlockedUser();
 
         LoginPage loginPage = new LoginPage();
         loginPage.validLogin(user);
@@ -45,6 +51,16 @@ public class AuthTest {
     @Test
     void shouldNotLoginWithWrongLogin() {
         User user = DataHelper.getWrongLoginUser();
+
+        LoginPage loginPage = new LoginPage();
+        loginPage.validLogin(user);
+        loginPage.verifyNotification("Ошибка! Неверно указан логин или пароль");
+    }
+
+    @Test
+    void shouldNotLoginWithWrongPassword() {
+        User user = DataHelper.getWrongPasswordUser();
+
         LoginPage loginPage = new LoginPage();
         loginPage.validLogin(user);
         loginPage.verifyNotification("Ошибка! Неверно указан логин или пароль");
@@ -53,11 +69,11 @@ public class AuthTest {
     @Test
     void shouldBlockUserAfterThreeWrong2FACodes() {
         User user = DataHelper.getRegisteredActiveUser();
-        SQLHelper.addUserIfNeeded(user);
 
         LoginPage loginPage = new LoginPage();
         VerificationPage verificationPage = loginPage.validLogin(user);
         verificationPage.isPageLoaded();
+
         verificationPage.enterWrongCodeMultipleTimes(DataHelper.getWrongVerificationCode(), 3);
         verificationPage.verifyErrorNotification("Ошибка! Пользователь заблокирован");
     }

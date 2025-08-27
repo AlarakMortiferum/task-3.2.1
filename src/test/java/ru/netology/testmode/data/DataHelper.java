@@ -6,15 +6,15 @@ public class DataHelper {
     }
 
     public static User getRegisteredBlockedUser() {
-        return new User("petya", "asdfgh456", "blocked");
+        return new User("petya", "123qwerty", "blocked");
     }
 
     public static User getWrongLoginUser() {
-        return new User("wrongLogin", "qwerty123", "active");
+        return new User("wrong_login", "qwerty123", "active");
     }
 
     public static User getWrongPasswordUser() {
-        return new User("vasya", "wrongPassword", "active");
+        return new User("vasya", "wrong_password", "active");
     }
 
     public static String getWrongVerificationCode() {
