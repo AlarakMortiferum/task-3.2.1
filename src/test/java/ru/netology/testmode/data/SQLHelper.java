@@ -45,7 +45,18 @@ public class SQLHelper {
         try (Connection conn = getConnection()) {
             return runner.query(conn, sql, new ScalarHandler<>(), user.getLogin());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Verification code not found for user: " + user.getLogin(), e);
+        }
+    }
+
+    public static void updateUserStatus(String login, String status) {
+        QueryRunner runner = new QueryRunner();
+        String sql = "UPDATE users SET status = ? WHERE login = ?";
+
+        try (Connection conn = getConnection()) {
+            runner.update(conn, sql, status, login);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating user status", e);
         }
     }
 
